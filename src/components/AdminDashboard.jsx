@@ -204,7 +204,7 @@ const AdminDashboard = ({
           alignItems: isMobile ? 'stretch' : 'center',
           gap: isMobile ? '1rem' : '0'
         }}>
-          <div>
+          <div style={{ flex: 1 }}>
             <h1 className="dashboard-title" style={{ fontSize: isMobile ? '1.5rem' : '2rem' }}>
               Admin Dashboard
             </h1>
@@ -219,28 +219,10 @@ const AdminDashboard = ({
           <div style={{ 
             display: 'flex', 
             gap: '1rem', 
-            flexWrap: isMobile ? 'wrap' : 'nowrap'
+            flexWrap: isMobile ? 'wrap' : 'nowrap',
+            justifyContent: isMobile ? 'center' : 'flex-end',
+            alignItems: 'center'
           }}>
-            <button
-              onClick={() => setShowAddEmployee(true)}
-              disabled={saving}
-              style={{
-                background: saving ? '#9ca3af' : '#10b981',
-                color: 'white',
-                border: 'none',
-                padding: isMobile ? '0.75rem 1rem' : '0.75rem 1.5rem',
-                borderRadius: '0.5rem',
-                cursor: saving ? 'not-allowed' : 'pointer',
-                fontWeight: 600,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                fontSize: isMobile ? '0.875rem' : '1rem',
-                touchAction: 'manipulation'
-              }}
-            >
-              <span>➕</span> {saving ? 'Processing...' : 'Add Employee'}
-            </button>
             {isMobile && (
               <button
                 onClick={() => setShowEmployeeList(!showEmployeeList)}
@@ -259,6 +241,41 @@ const AdminDashboard = ({
                 {showEmployeeList ? '📊 Stats' : '👥 Employees'}
               </button>
             )}
+            <button
+              onClick={() => setShowAddEmployee(true)}
+              disabled={saving}
+              style={{
+                background: saving ? '#9ca3af' : '#10b981',
+                color: 'white',
+                border: 'none',
+                padding: isMobile ? '0.75rem 1rem' : '0.75rem 1.5rem',
+                borderRadius: '0.5rem',
+                cursor: saving ? 'not-allowed' : 'pointer',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontSize: isMobile ? '0.875rem' : '1rem',
+                touchAction: 'manipulation',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                if (!saving) {
+                  e.target.style.transform = 'translateY(-1px)';
+                  e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!saving) {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+                }
+              }}
+            >
+              <span style={{ fontSize: isMobile ? '1rem' : '1.1rem' }}>➕</span> 
+              {saving ? 'Processing...' : 'Add Employee'}
+            </button>
           </div>
         </div>
       </div>
