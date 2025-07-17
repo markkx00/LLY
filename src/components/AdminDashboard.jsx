@@ -31,6 +31,22 @@ const AdminDashboard = ({
     eventsJoined: 0
   });
   const [saving, setSaving] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [showEmployeeList, setShowEmployeeList] = useState(false);
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent;
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+      const isSmallScreen = window.innerWidth <= 768;
+      setIsMobile(isMobileDevice || isSmallScreen);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Calculate company overview stats
   const companyStats = React.useMemo(() => {
@@ -165,440 +181,687 @@ const AdminDashboard = ({
   }
 
   return (
-    <div className="dashboard">
-      <div className="dashboard-header">
-        <div>
-          <h1 className="dashboard-title">Admin Dashboard</h1>
-          <p style={{ color: '#64748b', marginTop: '0.5rem' }}>
-            Manage employees, performance, and company overview
-          </p>
-        </div>
-        <button
-          onClick={() => setShowAddEmployee(true)}
-          disabled={saving}
-          style={{
-            background: saving ? '#9ca3af' : '#10b981',
-            color: 'white',
-            border: 'none',
-            padding: '0.75rem 1.5rem',
-            borderRadius: '0.5rem',
-            cursor: saving ? 'not-allowed' : 'pointer',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}
-        >
-          <span>➕</span> {saving ? 'Processing...' : 'Add Employee'}
-        </button>
-      </div>
-
-      {/* Company Overview */}
-      <div className="dashboard-grid" style={{ marginBottom: '2rem' }}>
-        <div className="card">
-          <div className="card-header">
-            <h3 className="card-title">Total Employees</h3>
-            <div className="card-icon blue">👥</div>
+    <div className="dashboard" style={{ 
+      minHeight: '100vh',
+      overflowY: 'auto',
+      overflowX: 'hidden',
+      touchAction: 'pan-y',
+      WebkitOverflowScrolling: 'touch'
+    }}>
+      <div className="dashboard-header" style={{
+        position: 'sticky',
+        top: 0,
+        background: '#f8fafc',
+        zIndex: 10,
+        padding: isMobile ? '1rem' : '2rem',
+        marginBottom: isMobile ? '1rem' : '2rem',
+        borderBottom: '1px solid #e2e8f0'
+      }}>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: isMobile ? 'column' : 'row',
+          justifyContent: 'space-between',
+          alignItems: isMobile ? 'stretch' : 'center',
+          gap: isMobile ? '1rem' : '0'
+        }}>
+          <div>
+            <h1 className="dashboard-title" style={{ fontSize: isMobile ? '1.5rem' : '2rem' }}>
+              Admin Dashboard
+            </h1>
+            <p style={{ 
+              color: '#64748b', 
+              marginTop: '0.5rem',
+              fontSize: isMobile ? '0.875rem' : '1rem'
+            }}>
+              Manage employees, performance, and company overview
+            </p>
           </div>
-          <div className="card-value">{companyStats.totalEmployees}</div>
-          <div className="card-description">Active employees in company</div>
-        </div>
-
-        <div className="card">
-          <div className="card-header">
-            <h3 className="card-title">Avg Skill Score</h3>
-            <div className="card-icon green">📊</div>
-          </div>
-          <div className="card-value">{companyStats.averagePerformance}%</div>
-          <div className="card-description">Company average skill score</div>
-        </div>
-
-        <div className="card">
-          <div className="card-header">
-            <h3 className="card-title">Activity Rate</h3>
-            <div className="card-icon yellow">⏰</div>
-          </div>
-          <div className="card-value">{companyStats.totalEventsJoined}</div>
-          <div className="card-description">Total events participated</div>
-        </div>
-
-        <div className="card">
-          <div className="card-header">
-            <h3 className="card-title">Tasks Completed</h3>
-            <div className="card-icon red">✅</div>
-          </div>
-          <div className="card-value">{companyStats.totalTasksCompleted}</div>
-          <div className="card-description">Total tasks completed by all employees</div>
-        </div>
-      </div>
-
-      {/* Add/Edit Employee Modal */}
-      {(showAddEmployee || editingEmployee) && (
-        <div className="card" style={{ marginBottom: '2rem' }}>
-          <div className="card-header">
-            <h3 className="card-title">
-              {editingEmployee ? 'Edit Employee' : 'Add New Employee'}
-            </h3>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-            <div style={{ display: 'grid', gap: '1rem' }}>
-              <div>
-                <label className="form-label">Full Name *</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={editingEmployee ? editingEmployee.name : newEmployee.name}
-                  onChange={(e) => {
-                    if (editingEmployee) {
-                      setEditingEmployee({ ...editingEmployee, name: e.target.value });
-                    } else {
-                      setNewEmployee({ ...newEmployee, name: e.target.value });
-                    }
-                  }}
-                  placeholder="Enter full name"
-                />
-              </div>
-              
-              <div>
-                <label className="form-label">Email *</label>
-                <input
-                  type="email"
-                  className="form-input"
-                  value={editingEmployee ? editingEmployee.email : newEmployee.email}
-                  onChange={(e) => {
-                    if (editingEmployee) {
-                      setEditingEmployee({ ...editingEmployee, email: e.target.value });
-                    } else {
-                      setNewEmployee({ ...newEmployee, email: e.target.value });
-                    }
-                  }}
-                  placeholder="Enter email address"
-                />
-              </div>
-
-              <div>
-                <label className="form-label">Position *</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={editingEmployee ? editingEmployee.position : newEmployee.position}
-                  onChange={(e) => {
-                    if (editingEmployee) {
-                      setEditingEmployee({ ...editingEmployee, position: e.target.value });
-                    } else {
-                      setNewEmployee({ ...newEmployee, position: e.target.value });
-                    }
-                  }}
-                  placeholder="Enter position"
-                />
-              </div>
-
-              <div>
-                <label className="form-label">Department</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={editingEmployee ? editingEmployee.department : newEmployee.department}
-                  onChange={(e) => {
-                    if (editingEmployee) {
-                      setEditingEmployee({ ...editingEmployee, department: e.target.value });
-                    } else {
-                      setNewEmployee({ ...newEmployee, department: e.target.value });
-                    }
-                  }}
-                  placeholder="Enter department"
-                />
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gap: '1rem' }}>
-              <div>
-                <label className="form-label">Phone</label>
-                <input
-                  type="tel"
-                  className="form-input"
-                  value={editingEmployee ? editingEmployee.phone : newEmployee.phone}
-                  onChange={(e) => {
-                    if (editingEmployee) {
-                      setEditingEmployee({ ...editingEmployee, phone: e.target.value });
-                    } else {
-                      setNewEmployee({ ...newEmployee, phone: e.target.value });
-                    }
-                  }}
-                  placeholder="Enter phone number"
-                />
-              </div>
-
-              <div>
-                <label className="form-label">Manager</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={editingEmployee ? editingEmployee.manager : newEmployee.manager}
-                  onChange={(e) => {
-                    if (editingEmployee) {
-                      setEditingEmployee({ ...editingEmployee, manager: e.target.value });
-                    } else {
-                      setNewEmployee({ ...newEmployee, manager: e.target.value });
-                    }
-                  }}
-                  placeholder="Enter manager name"
-                />
-              </div>
-
-              <div>
-                <label className="form-label">Activity Rate (%)</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  className="form-input" 
-                  value={editingEmployee ? editingEmployee.attendanceRate : newEmployee.attendanceRate}
-                  onChange={(e) => {
-                    if (editingEmployee) {
-                      setEditingEmployee({ ...editingEmployee, attendanceRate: parseInt(e.target.value) });
-                    } else {
-                      setNewEmployee({ ...newEmployee, attendanceRate: parseInt(e.target.value) });
-                    }
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Skills Management */}
-          {editingEmployee && (
-            <div style={{ marginTop: '2rem' }}>
-              <label className="form-label">Skills (Click to edit scores)</label>
-              <div style={{ display: 'grid', gap: '1rem' }}>
-                {editingEmployee.skills?.map((skill, index) => (
-                  <div key={index} style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '1rem',
-                    padding: '1rem',
-                    background: '#f8fafc',
-                    borderRadius: '0.5rem',
-                    border: '1px solid #e2e8f0'
-                  }}>
-                    <div style={{ flex: 1, fontWeight: 500 }}>{skill.name}</div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{
-                        background: getRankColor(getOverallRank(skill.score * 7)),
-                        color: 'white',
-                        padding: '0.25rem 0.5rem',
-                        borderRadius: '0.5rem',
-                        fontSize: '0.75rem',
-                        fontWeight: 600
-                      }}>
-                        Lv.{getSkillLevel(skill.score)}
-                      </span>
-                      <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={skill.score}
-                        onChange={(e) => {
-                          const updatedSkills = [...editingEmployee.skills];
-                          updatedSkills[index].score = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
-                          setEditingEmployee({ ...editingEmployee, skills: updatedSkills });
-                        }}
-                        style={{
-                          width: '80px',
-                          padding: '0.25rem 0.5rem',
-                          border: '1px solid #d1d5db',
-                          borderRadius: '0.25rem',
-                          fontSize: '0.875rem',
-                          textAlign: 'center'
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '2rem' }}>
+          <div style={{ 
+            display: 'flex', 
+            gap: '1rem', 
+            flexWrap: isMobile ? 'wrap' : 'nowrap'
+          }}>
             <button
-              onClick={() => {
-                setShowAddEmployee(false);
-                setEditingEmployee(null);
-                setNewEmployee({
-                  name: '',
-                  email: '',
-                  position: '',
-                  department: '',
-                  phone: '',
-                  manager: '',
-                  attendanceRate: 95,
-                  skills: [
-                    { name: 'ทดสอบ Munsell', score: 50 },
-                    { name: 'การต่อเทปร้อยเทป', score: 50 },
-                    { name: 'การเตรียมสีและสารเคมี', score: 50 },
-                    { name: 'การอ่านใบย้อม', score: 50 },
-                    { name: 'การตรวจคุณภาพงานย้อม', score: 50 },
-                    { name: 'การตรวจเช็คเครื่องจักร', score: 50 },
-                    { name: 'ทักษะการดูสี / เติมสี / ปรับสี', score: 50 }
-                  ],
-                  eventsJoined: 0
-                });
-              }}
-              disabled={saving}
-              style={{
-                background: '#6b7280',
-                color: 'white',
-                border: 'none',
-                padding: '0.75rem 1.5rem',
-                borderRadius: '0.5rem',
-                cursor: saving ? 'not-allowed' : 'pointer',
-                fontWeight: 500
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={editingEmployee ? handleUpdateEmployee : handleAddEmployee}
+              onClick={() => setShowAddEmployee(true)}
               disabled={saving}
               style={{
                 background: saving ? '#9ca3af' : '#10b981',
                 color: 'white',
                 border: 'none',
-                padding: '0.75rem 1.5rem',
+                padding: isMobile ? '0.75rem 1rem' : '0.75rem 1.5rem',
                 borderRadius: '0.5rem',
                 cursor: saving ? 'not-allowed' : 'pointer',
-                fontWeight: 500
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontSize: isMobile ? '0.875rem' : '1rem',
+                touchAction: 'manipulation'
               }}
             >
-              {saving ? 'Saving...' : (editingEmployee ? 'Update Employee' : 'Add Employee')}
+              <span>➕</span> {saving ? 'Processing...' : 'Add Employee'}
             </button>
+            {isMobile && (
+              <button
+                onClick={() => setShowEmployeeList(!showEmployeeList)}
+                style={{
+                  background: '#3b82f6',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '0.5rem',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  fontSize: '0.875rem',
+                  touchAction: 'manipulation'
+                }}
+              >
+                {showEmployeeList ? '📊 Stats' : '👥 Employees'}
+              </button>
+            )}
           </div>
-        </div>
-      )}
-
-      {/* Employee Management Table */}
-      <div className="card">
-        <div className="card-header">
-          <h3 className="card-title">Employee Management</h3>
-          <div style={{ color: '#64748b', fontSize: '0.875rem' }}>
-            {employees.length} employees total
-          </div>
-        </div>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '2px solid #e2e8f0' }}>
-                <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Employee</th>
-                <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Position</th>
-                <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Rank</th>
-                <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Avg Score</th>
-                <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Tasks</th>
-                <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Events</th>
-                <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {employees.map((employee) => {
-                const totalScore = (employee.skills || []).reduce((sum, skill) => sum + skill.score, 0);
-                const averageScore = calculateAverageSkillScore(employee.skills || []);
-                const rank = getOverallRank(totalScore);
-                
-                return (
-                  <tr key={employee.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                    <td style={{ padding: '1rem' }}>
-                      <div>
-                        <div style={{ fontWeight: 500, color: '#1e293b' }}>{employee.name}</div>
-                        <div style={{ fontSize: '0.875rem', color: '#64748b' }}>{employee.email}</div>
-                        <div style={{ fontSize: '0.875rem', color: '#64748b' }}>{employee.employeeId}</div>
-                      </div>
-                    </td>
-                    <td style={{ padding: '1rem' }}>
-                      <div style={{ fontWeight: 500, color: '#1e293b' }}>{employee.position}</div>
-                      <div style={{ fontSize: '0.875rem', color: '#64748b' }}>{employee.department}</div>
-                    </td>
-                    <td style={{ padding: '1rem' }}>
-                      <div style={{ 
-                        background: getRankColor(rank),
-                        color: 'white',
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '1rem',
-                        fontSize: '0.875rem',
-                        fontWeight: 700,
-                        textAlign: 'center'
-                      }}>
-                        Rank {rank}
-                      </div>
-                    </td>
-                    <td style={{ padding: '1rem' }}>
-                      <div style={{ 
-                        background: averageScore >= 85 ? '#d1fae5' : averageScore >= 70 ? '#dbeafe' : '#fef3c7',
-                        color: averageScore >= 85 ? '#065f46' : averageScore >= 70 ? '#1e40af' : '#92400e',
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '1rem',
-                        fontSize: '0.875rem',
-                        fontWeight: 500,
-                        textAlign: 'center'
-                      }}>
-                        {averageScore}%
-                      </div>
-                    </td>
-                    <td style={{ padding: '1rem', textAlign: 'center', fontWeight: 500 }}>
-                      {employee.tasksCompleted || 0}
-                    </td>
-                    <td style={{ padding: '1rem' }}>
-                      <div style={{ 
-                        background: (employee.eventsJoined || 0) >= 10 ? '#d1fae5' : (employee.eventsJoined || 0) >= 5 ? '#dbeafe' : '#fef3c7',
-                        color: (employee.eventsJoined || 0) >= 10 ? '#065f46' : (employee.eventsJoined || 0) >= 5 ? '#1e40af' : '#92400e',
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '1rem',
-                        fontSize: '0.875rem',
-                        fontWeight: 500,
-                        textAlign: 'center'
-                      }}>
-                        {employee.eventsJoined || 0} events
-                      </div>
-                    </td>
-                    <td style={{ padding: '1rem' }}>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <button
-                          onClick={() => handleEditEmployee(employee)}
-                          disabled={saving}
-                          style={{
-                            background: saving ? '#9ca3af' : '#3b82f6',
-                            color: 'white',
-                            border: 'none',
-                            padding: '0.5rem',
-                            borderRadius: '0.25rem',
-                            cursor: saving ? 'not-allowed' : 'pointer',
-                            fontSize: '0.875rem'
-                          }}
-                        >
-                          ✏️
-                        </button>
-                        <button
-                          onClick={() => handleDeleteEmployee(employee.id)}
-                          disabled={saving}
-                          style={{
-                            background: saving ? '#9ca3af' : '#ef4444',
-                            color: 'white',
-                            border: 'none',
-                            padding: '0.5rem',
-                            borderRadius: '0.25rem',
-                            cursor: saving ? 'not-allowed' : 'pointer',
-                            fontSize: '0.875rem'
-                          }}
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
         </div>
       </div>
+
+      {/* Company Overview */}
+      <div className="dashboard-grid" style={{ 
+        marginBottom: isMobile ? '1rem' : '2rem',
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: isMobile ? '0.75rem' : '2rem',
+        padding: isMobile ? '0 1rem' : '0'
+      }}>
+        <div className="card" style={{ padding: isMobile ? '1rem' : '2rem' }}>
+          <div className="card-header">
+            <h3 className="card-title" style={{ fontSize: isMobile ? '0.875rem' : '1.25rem' }}>
+              Total Employees
+            </h3>
+            <div className="card-icon blue" style={{ 
+              width: isMobile ? '30px' : '40px', 
+              height: isMobile ? '30px' : '40px',
+              fontSize: isMobile ? '0.875rem' : '1rem'
+            }}>👥</div>
+          </div>
+          <div className="card-value" style={{ fontSize: isMobile ? '1.5rem' : '2rem' }}>
+            {companyStats.totalEmployees}
+          </div>
+          <div className="card-description" style={{ fontSize: isMobile ? '0.75rem' : '0.875rem' }}>
+            Active employees in system
+          </div>
+        </div>
+
+        <div className="card" style={{ padding: isMobile ? '1rem' : '2rem' }}>
+          <div className="card-header">
+            <h3 className="card-title" style={{ fontSize: isMobile ? '0.875rem' : '1.25rem' }}>
+              Avg Performance
+            </h3>
+            <div className="card-icon green" style={{ 
+              width: isMobile ? '30px' : '40px', 
+              height: isMobile ? '30px' : '40px',
+              fontSize: isMobile ? '0.875rem' : '1rem'
+            }}>📈</div>
+          </div>
+          <div className="card-value" style={{ fontSize: isMobile ? '1.5rem' : '2rem' }}>
+            {companyStats.averagePerformance}%
+          </div>
+          <div className="card-description" style={{ fontSize: isMobile ? '0.75rem' : '0.875rem' }}>
+            Average skill performance
+          </div>
+        </div>
+
+        <div className="card" style={{ padding: isMobile ? '1rem' : '2rem' }}>
+          <div className="card-header">
+            <h3 className="card-title" style={{ fontSize: isMobile ? '0.875rem' : '1.25rem' }}>
+              Avg Attendance
+            </h3>
+            <div className="card-icon yellow" style={{ 
+              width: isMobile ? '30px' : '40px', 
+              height: isMobile ? '30px' : '40px',
+              fontSize: isMobile ? '0.875rem' : '1rem'
+            }}>📅</div>
+          </div>
+          <div className="card-value" style={{ fontSize: isMobile ? '1.5rem' : '2rem' }}>
+            {companyStats.averageAttendance}%
+          </div>
+          <div className="card-description" style={{ fontSize: isMobile ? '0.75rem' : '0.875rem' }}>
+            Average attendance rate
+          </div>
+        </div>
+
+        <div className="card" style={{ padding: isMobile ? '1rem' : '2rem' }}>
+          <div className="card-header">
+            <h3 className="card-title" style={{ fontSize: isMobile ? '0.875rem' : '1.25rem' }}>
+              Tasks Completed
+            </h3>
+            <div className="card-icon green" style={{ 
+              width: isMobile ? '30px' : '40px', 
+              height: isMobile ? '30px' : '40px',
+              fontSize: isMobile ? '0.875rem' : '1rem'
+            }}>✅</div>
+          </div>
+          <div className="card-value" style={{ fontSize: isMobile ? '1.5rem' : '2rem' }}>
+            {companyStats.totalTasksCompleted}
+          </div>
+          <div className="card-description" style={{ fontSize: isMobile ? '0.75rem' : '0.875rem' }}>
+            Total tasks completed by all employees
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Toggle View */}
+      {isMobile ? (
+        showEmployeeList ? (
+          // Employee List View for Mobile
+          <div style={{ padding: '0 1rem' }}>
+            <h2 style={{ 
+              fontSize: '1.25rem', 
+              fontWeight: 600, 
+              marginBottom: '1rem',
+              color: '#1e293b'
+            }}>
+              Employee List
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {employees.map((employee) => (
+                <div key={employee.id} className="card" style={{ 
+                  padding: '1rem',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '0.75rem',
+                  background: 'white'
+                }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    marginBottom: '0.75rem'
+                  }}>
+                    <div>
+                      <h3 style={{ 
+                        fontSize: '1rem', 
+                        fontWeight: 600, 
+                        color: '#1e293b',
+                        marginBottom: '0.25rem'
+                      }}>
+                        {employee.name}
+                      </h3>
+                      <p style={{ 
+                        fontSize: '0.875rem', 
+                        color: '#64748b',
+                        marginBottom: '0.25rem'
+                      }}>
+                        {employee.position} • {employee.department}
+                      </p>
+                      <p style={{ fontSize: '0.75rem', color: '#9ca3af' }}>
+                        {employee.email}
+                      </p>
+                    </div>
+                    <div style={{ 
+                      display: 'flex', 
+                      gap: '0.5rem',
+                      flexDirection: 'column'
+                    }}>
+                      <button
+                        onClick={() => handleEditEmployee(employee)}
+                        style={{
+                          background: '#3b82f6',
+                          color: 'white',
+                          border: 'none',
+                          padding: '0.5rem 0.75rem',
+                          borderRadius: '0.375rem',
+                          cursor: 'pointer',
+                          fontSize: '0.75rem',
+                          fontWeight: 500,
+                          touchAction: 'manipulation'
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteEmployee(employee.id)}
+                        style={{
+                          background: '#ef4444',
+                          color: 'white',
+                          border: 'none',
+                          padding: '0.5rem 0.75rem',
+                          borderRadius: '0.375rem',
+                          cursor: 'pointer',
+                          fontSize: '0.75rem',
+                          fontWeight: 500,
+                          touchAction: 'manipulation'
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between',
+                    fontSize: '0.75rem',
+                    color: '#64748b'
+                  }}>
+                    <span>Attendance: {employee.attendanceRate}%</span>
+                    <span>Performance: {calculateAverageSkillScore(employee.skills || [])}%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          // Stats View for Mobile
+          <div style={{ padding: '0 1rem' }}>
+            <h2 style={{ 
+              fontSize: '1.25rem', 
+              fontWeight: 600, 
+              marginBottom: '1rem',
+              color: '#1e293b'
+            }}>
+              Performance Overview
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {employees.slice(0, 5).map((employee) => (
+                <div key={employee.id} className="card" style={{ 
+                  padding: '1rem',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '0.75rem',
+                  background: 'white'
+                }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center'
+                  }}>
+                    <div>
+                      <h3 style={{ 
+                        fontSize: '1rem', 
+                        fontWeight: 600, 
+                        color: '#1e293b',
+                        marginBottom: '0.25rem'
+                      }}>
+                        {employee.name}
+                      </h3>
+                      <p style={{ fontSize: '0.875rem', color: '#64748b' }}>
+                        {employee.position}
+                      </p>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ 
+                        fontSize: '1.25rem', 
+                        fontWeight: 700,
+                        color: getRankColor(calculateAverageSkillScore(employee.skills || []))
+                      }}>
+                        {calculateAverageSkillScore(employee.skills || [])}%
+                      </div>
+                      <div style={{ 
+                        fontSize: '0.75rem', 
+                        color: '#64748b',
+                        textTransform: 'uppercase'
+                      }}>
+                        {getSkillLevel(calculateAverageSkillScore(employee.skills || []))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      ) : (
+        // Desktop View - Original layout
+        <>
+          {/* Add Employee Modal */}
+          {showAddEmployee && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+              padding: '1rem'
+            }}>
+              <div style={{
+                background: 'white',
+                padding: '2rem',
+                borderRadius: '1rem',
+                width: '100%',
+                maxWidth: '500px',
+                maxHeight: '90vh',
+                overflowY: 'auto'
+              }}>
+                <h2 style={{ marginBottom: '1.5rem', fontSize: '1.5rem', fontWeight: 600 }}>
+                  Add New Employee
+                </h2>
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                  <div>
+                    <label className="form-label">Name *</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={newEmployee.name}
+                      onChange={(e) => setNewEmployee(prev => ({ ...prev, name: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">Email *</label>
+                    <input
+                      type="email"
+                      className="form-input"
+                      value={newEmployee.email}
+                      onChange={(e) => setNewEmployee(prev => ({ ...prev, email: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">Position *</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={newEmployee.position}
+                      onChange={(e) => setNewEmployee(prev => ({ ...prev, position: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">Department</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={newEmployee.department}
+                      onChange={(e) => setNewEmployee(prev => ({ ...prev, department: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">Phone</label>
+                    <input
+                      type="tel"
+                      className="form-input"
+                      value={newEmployee.phone}
+                      onChange={(e) => setNewEmployee(prev => ({ ...prev, phone: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">Manager</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={newEmployee.manager}
+                      onChange={(e) => setNewEmployee(prev => ({ ...prev, manager: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                  <button
+                    onClick={handleAddEmployee}
+                    disabled={saving}
+                    style={{
+                      background: saving ? '#9ca3af' : '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      padding: '0.75rem 1.5rem',
+                      borderRadius: '0.5rem',
+                      cursor: saving ? 'not-allowed' : 'pointer',
+                      fontWeight: 600
+                    }}
+                  >
+                    {saving ? 'Adding...' : 'Add Employee'}
+                  </button>
+                  <button
+                    onClick={() => setShowAddEmployee(false)}
+                    style={{
+                      background: '#6b7280',
+                      color: 'white',
+                      border: 'none',
+                      padding: '0.75rem 1.5rem',
+                      borderRadius: '0.5rem',
+                      cursor: 'pointer',
+                      fontWeight: 600
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Edit Employee Modal */}
+          {editingEmployee && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+              padding: '1rem'
+            }}>
+              <div style={{
+                background: 'white',
+                padding: '2rem',
+                borderRadius: '1rem',
+                width: '100%',
+                maxWidth: '600px',
+                maxHeight: '90vh',
+                overflowY: 'auto'
+              }}>
+                <h2 style={{ marginBottom: '1.5rem', fontSize: '1.5rem', fontWeight: 600 }}>
+                  Edit Employee: {editingEmployee.name}
+                </h2>
+                
+                {/* Basic Info */}
+                <div style={{ marginBottom: '2rem' }}>
+                  <h3 style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: 600 }}>
+                    Basic Information
+                  </h3>
+                  <div style={{ display: 'grid', gap: '1rem' }}>
+                    <div>
+                      <label className="form-label">Name</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={editingEmployee.name}
+                        onChange={(e) => setEditingEmployee(prev => ({ ...prev, name: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <label className="form-label">Email</label>
+                      <input
+                        type="email"
+                        className="form-input"
+                        value={editingEmployee.email}
+                        onChange={(e) => setEditingEmployee(prev => ({ ...prev, email: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <label className="form-label">Position</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={editingEmployee.position}
+                        onChange={(e) => setEditingEmployee(prev => ({ ...prev, position: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <label className="form-label">Department</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={editingEmployee.department}
+                        onChange={(e) => setEditingEmployee(prev => ({ ...prev, department: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Skills */}
+                <div style={{ marginBottom: '2rem' }}>
+                  <h3 style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: 600 }}>
+                    Skills Assessment
+                  </h3>
+                  <div style={{ display: 'grid', gap: '1rem' }}>
+                    {(editingEmployee.skills || []).map((skill, index) => (
+                      <div key={index}>
+                        <label className="form-label">{skill.name}</label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={skill.score}
+                            onChange={(e) => {
+                              const newSkills = [...editingEmployee.skills];
+                              newSkills[index].score = parseInt(e.target.value);
+                              setEditingEmployee(prev => ({ ...prev, skills: newSkills }));
+                            }}
+                            style={{ flex: 1 }}
+                          />
+                          <span style={{ minWidth: '3rem', textAlign: 'right', fontWeight: 600 }}>
+                            {skill.score}%
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button
+                    onClick={handleUpdateEmployee}
+                    disabled={saving}
+                    style={{
+                      background: saving ? '#9ca3af' : '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      padding: '0.75rem 1.5rem',
+                      borderRadius: '0.5rem',
+                      cursor: saving ? 'not-allowed' : 'pointer',
+                      fontWeight: 600
+                    }}
+                  >
+                    {saving ? 'Saving...' : 'Save Changes'}
+                  </button>
+                  <button
+                    onClick={() => setEditingEmployee(null)}
+                    style={{
+                      background: '#6b7280',
+                      color: 'white',
+                      border: 'none',
+                      padding: '0.75rem 1.5rem',
+                      borderRadius: '0.5rem',
+                      cursor: 'pointer',
+                      fontWeight: 600
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Employee Table */}
+          <div className="card" style={{ padding: '2rem' }}>
+            <h2 style={{ marginBottom: '1.5rem', fontSize: '1.5rem', fontWeight: 600 }}>
+              Employee Management
+            </h2>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid #e2e8f0' }}>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Name</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Position</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Department</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Performance</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Attendance</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Tasks</th>
+                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {employees.map((employee) => {
+                    const performance = calculateAverageSkillScore(employee.skills || []);
+                    return (
+                      <tr key={employee.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                        <td style={{ padding: '1rem' }}>
+                          <div>
+                            <div style={{ fontWeight: 600, color: '#1e293b' }}>{employee.name}</div>
+                            <div style={{ fontSize: '0.875rem', color: '#64748b' }}>{employee.email}</div>
+                          </div>
+                        </td>
+                        <td style={{ padding: '1rem', color: '#374151' }}>{employee.position}</td>
+                        <td style={{ padding: '1rem', color: '#374151' }}>{employee.department}</td>
+                        <td style={{ padding: '1rem' }}>
+                          <div style={{ 
+                            color: getRankColor(performance), 
+                            fontWeight: 600 
+                          }}>
+                            {performance}%
+                          </div>
+                          <div style={{ fontSize: '0.875rem', color: '#64748b' }}>
+                            {getSkillLevel(performance)}
+                          </div>
+                        </td>
+                        <td style={{ padding: '1rem' }}>
+                          <div style={{ 
+                            color: employee.attendanceRate >= 90 ? '#10b981' : 
+                                   employee.attendanceRate >= 80 ? '#f59e0b' : '#ef4444',
+                            fontWeight: 600 
+                          }}>
+                            {employee.attendanceRate}%
+                          </div>
+                        </td>
+                        <td style={{ padding: '1rem', color: '#374151' }}>
+                          {employee.tasksCompleted || 0}
+                        </td>
+                        <td style={{ padding: '1rem' }}>
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button
+                              onClick={() => handleEditEmployee(employee)}
+                              style={{
+                                background: '#3b82f6',
+                                color: 'white',
+                                border: 'none',
+                                padding: '0.5rem 1rem',
+                                borderRadius: '0.375rem',
+                                cursor: 'pointer',
+                                fontSize: '0.875rem',
+                                fontWeight: 500
+                              }}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteEmployee(employee.id)}
+                              style={{
+                                background: '#ef4444',
+                                color: 'white',
+                                border: 'none',
+                                padding: '0.5rem 1rem',
+                                borderRadius: '0.375rem',
+                                cursor: 'pointer',
+                                fontSize: '0.875rem',
+                                fontWeight: 500
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
