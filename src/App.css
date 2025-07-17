@@ -5,12 +5,9 @@
   box-sizing: border-box;
 }
 
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background-color: #f8fafc;
-  color: #1e293b;
-  line-height: 1.6;
-  /* Allow vertical scrolling, prevent horizontal scrolling */
+html {
+  /* Ensure proper scrolling on all devices */
+  height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
   /* Enable smooth scrolling */
@@ -19,40 +16,39 @@ body {
   touch-action: pan-y;
   /* Prevent zoom on input focus for iOS */
   -webkit-text-size-adjust: 100%;
+  /* Fix for iOS Safari */
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Hide scrollbar for mobile devices but keep functionality */
-@media (max-width: 768px) {
-  body {
-    overflow-x: hidden;
-    overflow-y: auto;
-    /* Ensure proper scrolling on mobile */
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  /* Custom scrollbar for webkit browsers on mobile */
-  ::-webkit-scrollbar {
-    display: none;
-  }
-  
-  /* Hide scrollbar for Firefox on mobile */
-  html {
-    scrollbar-width: none;
-  }
-  
-  /* Ensure proper viewport handling */
-  .dashboard {
-    min-height: 100vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    touch-action: pan-y;
-    -webkit-overflow-scrolling: touch;
-  }
-  
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+  line-height: 1.6;
+  /* Ensure proper scrolling */
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* Enable smooth scrolling */
+  scroll-behavior: smooth;
+  /* Better touch handling */
+  touch-action: pan-y;
+  /* Prevent zoom on input focus for iOS */
+  -webkit-text-size-adjust: 100%;
   /* Fix for iOS Safari */
-  .dashboard * {
-    -webkit-tap-highlight-color: transparent;
-  }
+  -webkit-overflow-scrolling: touch;
+}
+
+/* App container */
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* Ensure proper scrolling */
+  overflow-x: hidden;
+  overflow-y: auto;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Ensure main content area can scroll properly */
@@ -63,15 +59,128 @@ body {
   margin: 0 auto;
   width: 100%;
   /* Ensure proper scrolling */
-  overflow-y: auto;
   overflow-x: hidden;
-  min-height: calc(100vh - 80px); /* Adjust based on nav height */
+  overflow-y: auto;
+  min-height: calc(100vh - 80px);
+  /* Enable smooth scrolling */
+  scroll-behavior: smooth;
+  /* Better touch handling */
+  touch-action: pan-y;
+  /* Fix for iOS Safari */
+  -webkit-overflow-scrolling: touch;
 }
 
+/* Dashboard container */
+.dashboard {
+  /* Ensure proper scrolling */
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* Enable smooth scrolling */
+  scroll-behavior: smooth;
+  /* Better touch handling */
+  touch-action: pan-y;
+  /* Fix for iOS Safari */
+  -webkit-overflow-scrolling: touch;
+  /* Prevent horizontal scrolling */
+  max-width: 100%;
+}
+
+/* Mobile-specific fixes */
 @media (max-width: 768px) {
+  html {
+    /* Ensure proper viewport handling */
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  body {
+    /* Ensure proper scrolling on mobile */
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    /* Prevent body from being fixed */
+    position: relative;
+    width: 100%;
+  }
+  
+  .App {
+    /* Ensure proper scrolling on mobile */
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
   .main-content {
     padding: 1rem;
-    min-height: calc(100vh - 120px); /* Adjust for mobile nav */
+    min-height: calc(100vh - 120px);
+    /* Ensure proper scrolling on mobile */
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .dashboard {
+    /* Ensure proper scrolling on mobile */
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    /* Prevent horizontal scrolling */
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  /* Fix for iOS Safari */
+  .dashboard * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Ensure all scrollable containers work properly */
+  .card, .dashboard-grid, .dashboard-header {
+    overflow-x: hidden;
+    overflow-y: visible;
+  }
+  
+  /* Hide scrollbars but keep functionality */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for Firefox on mobile */
+  html {
+    scrollbar-width: none;
+  }
+}
+
+/* iOS-specific fixes */
+@supports (-webkit-touch-callout: none) {
+  html, body {
+    /* iOS Safari specific fixes */
+    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  
+  .dashboard, .main-content {
+    /* iOS Safari specific fixes */
+    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+}
+
+/* Android-specific fixes */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  html, body {
+    /* Android Chrome specific fixes */
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -1113,3 +1222,71 @@ body {
 .p-4 { padding: 1rem; }
 .rounded { border-radius: 0.5rem; }
 .shadow { box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); } 
+
+/* Additional mobile scrolling fixes for all browsers */
+/* Samsung Internet */
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (max-width: 768px) {
+  html, body, .App, .main-content, .dashboard {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+}
+
+/* Firefox Mobile */
+@-moz-document url-prefix() {
+  html, body, .App, .main-content, .dashboard {
+    overflow-x: hidden;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+}
+
+/* Edge Mobile */
+@supports (-ms-ime-align: auto) {
+  html, body, .App, .main-content, .dashboard {
+    overflow-x: hidden;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+  }
+}
+
+/* Opera Mobile */
+@media screen and (max-width: 768px) {
+  html, body, .App, .main-content, .dashboard {
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Universal mobile scrolling fix */
+* {
+  /* Ensure all elements can scroll properly */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fix for any fixed positioning that might interfere with scrolling */
+.fixed, [style*="position: fixed"] {
+  /* Ensure fixed elements don't interfere with scrolling */
+  z-index: 1000;
+}
+
+/* Ensure proper scrolling on all touch devices */
+@media (hover: none) and (pointer: coarse) {
+  html, body, .App, .main-content, .dashboard {
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+}
+
+/* Fix for devices with notches */
+@supports (padding: max(0px)) {
+  .main-content {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+} 
