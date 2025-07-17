@@ -10,15 +10,24 @@ body {
   background-color: #f8fafc;
   color: #1e293b;
   line-height: 1.6;
-  /* Hide scrollbar on mobile for cleaner look */
+  /* Allow vertical scrolling, prevent horizontal scrolling */
   overflow-x: hidden;
+  overflow-y: auto;
+  /* Enable smooth scrolling */
+  scroll-behavior: smooth;
+  /* Better touch handling */
+  touch-action: pan-y;
+  /* Prevent zoom on input focus for iOS */
+  -webkit-text-size-adjust: 100%;
 }
 
-/* Hide scrollbar for mobile devices */
+/* Hide scrollbar for mobile devices but keep functionality */
 @media (max-width: 768px) {
   body {
     overflow-x: hidden;
-    /* overflow: hidden; */ /* Remove this to allow vertical scrolling */
+    overflow-y: auto;
+    /* Ensure proper scrolling on mobile */
+    -webkit-overflow-scrolling: touch;
   }
   
   /* Custom scrollbar for webkit browsers on mobile */
@@ -30,12 +39,40 @@ body {
   html {
     scrollbar-width: none;
   }
+  
+  /* Ensure proper viewport handling */
+  .dashboard {
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Fix for iOS Safari */
+  .dashboard * {
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
-.App {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+/* Ensure main content area can scroll properly */
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  /* Ensure proper scrolling */
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: calc(100vh - 80px); /* Adjust based on nav height */
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+    min-height: calc(100vh - 120px); /* Adjust for mobile nav */
+  }
 }
 
 /* Loading styles */
