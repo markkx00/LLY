@@ -10,7 +10,6 @@ import './App.css';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import EmployeeProfile from './components/EmployeeProfile';
-import TaskManager from './taskmanager';
 import ActivityModule from './components/ActivityModule';
 import PersonalPotential from './components/PersonalPotential';
 import AdminDashboard from './components/AdminDashboard';
@@ -195,22 +194,6 @@ function App() {
                       user={user} 
                       employees={employees}
                     />
-                  } 
-                />
-                <Route 
-                  path="/tasks" 
-                  element={
-                    isAdmin ? (
-                      <TaskManager 
-                        user={user}
-                        isAdmin={isAdmin}
-                      />
-                    ) : (
-                      <TaskManager 
-                        user={user}
-                        isAdmin={isAdmin}
-                      />
-                    )
                   } 
                 />
                 <Route 
