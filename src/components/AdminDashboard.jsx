@@ -794,15 +794,12 @@ const AdminDashboard = ({
                     <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Name</th>
                     <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Position</th>
                     <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Department</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Performance</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Attendance</th>
                     <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Tasks</th>
                     <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 600, color: '#374151' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {employees.map((employee) => {
-                    const performance = calculateAverageSkillScore(employee.skills || []);
                     return (
                       <tr key={employee.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
                         <td style={{ padding: '1rem' }}>
@@ -813,26 +810,6 @@ const AdminDashboard = ({
                         </td>
                         <td style={{ padding: '1rem', color: '#374151' }}>{employee.position}</td>
                         <td style={{ padding: '1rem', color: '#374151' }}>{employee.department}</td>
-                        <td style={{ padding: '1rem' }}>
-                          <div style={{ 
-                            color: getRankColor(performance), 
-                            fontWeight: 600 
-                          }}>
-                            {performance}%
-                          </div>
-                          <div style={{ fontSize: '0.875rem', color: '#64748b' }}>
-                            {getSkillLevel(performance)}
-                          </div>
-                        </td>
-                        <td style={{ padding: '1rem' }}>
-                          <div style={{ 
-                            color: employee.attendanceRate >= 90 ? '#10b981' : 
-                                   employee.attendanceRate >= 80 ? '#f59e0b' : '#ef4444',
-                            fontWeight: 600 
-                          }}>
-                            {employee.attendanceRate}%
-                          </div>
-                        </td>
                         <td style={{ padding: '1rem', color: '#374151' }}>
                           {employee.tasksCompleted || 0}
                         </td>
