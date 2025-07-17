@@ -49,12 +49,6 @@ const Navigation = ({ user, onLogout }) => {
             >
               Events
             </Link>
-            <Link 
-              to="/tasks" 
-              className={`nav-link ${isActive('/tasks') ? 'active' : ''}`}
-            >
-              Task Management
-            </Link>
           </>
         ) : (
           <>
@@ -63,12 +57,6 @@ const Navigation = ({ user, onLogout }) => {
               className={`nav-link ${isActive('/profile') ? 'active' : ''}`}
             >
               Profile
-            </Link>
-            <Link 
-              to="/tasks" 
-              className={`nav-link ${isActive('/tasks') ? 'active' : ''}`}
-            >
-              Tasks
             </Link>
             <Link 
               to="/activity" 
