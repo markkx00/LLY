@@ -25,10 +25,18 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  /* Remove display: flex and place-items: center to allow proper scrolling */
   min-width: 320px;
   min-height: 100vh;
+  /* Ensure proper scrolling */
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* Enable smooth scrolling */
+  scroll-behavior: smooth;
+  /* Better touch handling */
+  touch-action: pan-y;
+  /* Fix for iOS Safari */
+  -webkit-overflow-scrolling: touch;
 }
 
 h1 {
@@ -67,5 +75,39 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
     color: #213547;
+  }
+}
+
+/* Mobile-specific fixes */
+@media (max-width: 768px) {
+  body {
+    /* Ensure proper scrolling on mobile */
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    /* Prevent body from being fixed */
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+  }
+}
+
+/* iOS-specific fixes */
+@supports (-webkit-touch-callout: none) {
+  body {
+    /* iOS Safari specific fixes */
+    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+}
+
+/* Android-specific fixes */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  body {
+    /* Android Chrome specific fixes */
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 } 
