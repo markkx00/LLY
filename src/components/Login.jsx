@@ -211,10 +211,6 @@ const Login = () => {
                 />
               </div>
             </div>
-                 autoComplete="email"
-                 autoCapitalize="none"
-                 autoCorrect="off"
-                 spellCheck="false"
 
             <div className="desktop-form-group">
               <label htmlFor="desktop-password" className="desktop-form-label">
@@ -230,7 +226,6 @@ const Login = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   required
-                 autoComplete="current-password"
                 />
               </div>
             </div>
