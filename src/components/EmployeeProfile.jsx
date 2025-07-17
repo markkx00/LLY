@@ -16,9 +16,22 @@ const EmployeeProfile = ({ user }) => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedProfile, setEditedProfile] = useState({});
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setEditedProfile(profile);
+    
+    // Detect mobile device
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent;
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+      const isSmallScreen = window.innerWidth <= 768;
+      setIsMobile(isMobileDevice || isSmallScreen);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, [profile]);
 
   const handleSave = async () => {
@@ -51,10 +64,31 @@ const EmployeeProfile = ({ user }) => {
   };
 
   return (
-    <div className="dashboard">
-      <div className="dashboard-header">
-        <h1 className="dashboard-title">Employee Profile</h1>
-        <div>
+    <div className="dashboard" style={{ 
+      minHeight: '100vh',
+      overflowY: 'auto',
+      overflowX: 'hidden',
+      touchAction: 'pan-y',
+      WebkitOverflowScrolling: 'touch'
+    }}>
+      <div className="dashboard-header" style={{
+        position: 'sticky',
+        top: 0,
+        background: '#f8fafc',
+        zIndex: 10,
+        padding: isMobile ? '1rem' : '2rem',
+        marginBottom: isMobile ? '1rem' : '2rem',
+        borderBottom: '1px solid #e2e8f0'
+      }}>
+        <h1 className="dashboard-title" style={{ fontSize: isMobile ? '1.5rem' : '2rem' }}>
+          Employee Profile
+        </h1>
+        <div style={{ 
+          display: 'flex', 
+          gap: '1rem', 
+          flexWrap: isMobile ? 'wrap' : 'nowrap',
+          marginTop: isMobile ? '1rem' : '0'
+        }}>
           {!isEditing ? (
             <button 
               onClick={() => setIsEditing(true)}
@@ -62,26 +96,30 @@ const EmployeeProfile = ({ user }) => {
                 background: '#3b82f6',
                 color: 'white',
                 border: 'none',
-                padding: '0.75rem 1.5rem',
+                padding: isMobile ? '0.75rem 1rem' : '0.75rem 1.5rem',
                 borderRadius: '0.5rem',
                 cursor: 'pointer',
-                fontWeight: 500
+                fontWeight: 500,
+                fontSize: isMobile ? '0.875rem' : '1rem',
+                touchAction: 'manipulation'
               }}
             >
               Edit Profile
             </button>
           ) : (
-            <div style={{ display: 'flex', gap: '1rem' }}>
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
               <button 
                 onClick={handleSave}
                 style={{
                   background: '#10b981',
                   color: 'white',
                   border: 'none',
-                  padding: '0.75rem 1.5rem',
+                  padding: isMobile ? '0.75rem 1rem' : '0.75rem 1.5rem',
                   borderRadius: '0.5rem',
                   cursor: 'pointer',
-                  fontWeight: 500
+                  fontWeight: 500,
+                  fontSize: isMobile ? '0.875rem' : '1rem',
+                  touchAction: 'manipulation'
                 }}
               >
                 Save Changes
@@ -92,10 +130,12 @@ const EmployeeProfile = ({ user }) => {
                   background: '#6b7280',
                   color: 'white',
                   border: 'none',
-                  padding: '0.75rem 1.5rem',
+                  padding: isMobile ? '0.75rem 1rem' : '0.75rem 1.5rem',
                   borderRadius: '0.5rem',
                   cursor: 'pointer',
-                  fontWeight: 500
+                  fontWeight: 500,
+                  fontSize: isMobile ? '0.875rem' : '1rem',
+                  touchAction: 'manipulation'
                 }}
               >
                 Cancel
@@ -105,64 +145,102 @@ const EmployeeProfile = ({ user }) => {
         </div>
       </div>
 
-      <div className="dashboard-grid">
+      <div className="dashboard-grid" style={{
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))',
+        gap: isMobile ? '1rem' : '2rem',
+        padding: isMobile ? '0 1rem' : '0'
+      }}>
         {/* Basic Information */}
-        <div className="card">
+        <div className="card" style={{ padding: isMobile ? '1.5rem' : '2rem' }}>
           <div className="card-header">
-            <h3 className="card-title">Basic Information</h3>
+            <h3 className="card-title" style={{ fontSize: isMobile ? '1.1rem' : '1.25rem' }}>
+              Basic Information
+            </h3>
           </div>
-          <div style={{ display: 'grid', gap: '1rem' }}>
+          <div style={{ display: 'grid', gap: isMobile ? '0.75rem' : '1rem' }}>
             <div>
-              <label className="form-label">Full Name</label>
+              <label className="form-label" style={{ fontSize: isMobile ? '0.875rem' : '1rem' }}>
+                Full Name
+              </label>
               {isEditing ? (
                 <input
                   type="text"
                   className="form-input"
                   value={editedProfile.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
+                  style={{ fontSize: isMobile ? '16px' : '1rem' }}
                 />
               ) : (
-                <div style={{ padding: '0.75rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem' }}>
+                <div style={{ 
+                  padding: isMobile ? '0.5rem' : '0.75rem', 
+                  backgroundColor: '#f8fafc', 
+                  borderRadius: '0.5rem',
+                  fontSize: isMobile ? '0.875rem' : '1rem'
+                }}>
                   {profile.name}
                 </div>
               )}
             </div>
             
             <div>
-              <label className="form-label">Position</label>
+              <label className="form-label" style={{ fontSize: isMobile ? '0.875rem' : '1rem' }}>
+                Position
+              </label>
               {isEditing ? (
                 <input
                   type="text"
                   className="form-input"
                   value={editedProfile.position}
                   onChange={(e) => handleInputChange('position', e.target.value)}
+                  style={{ fontSize: isMobile ? '16px' : '1rem' }}
                 />
               ) : (
-                <div style={{ padding: '0.75rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem' }}>
+                <div style={{ 
+                  padding: isMobile ? '0.5rem' : '0.75rem', 
+                  backgroundColor: '#f8fafc', 
+                  borderRadius: '0.5rem',
+                  fontSize: isMobile ? '0.875rem' : '1rem'
+                }}>
                   {profile.position}
                 </div>
               )}
             </div>
 
             <div>
-              <label className="form-label">Department</label>
+              <label className="form-label" style={{ fontSize: isMobile ? '0.875rem' : '1rem' }}>
+                Department
+              </label>
               {isEditing ? (
                 <input
                   type="text"
                   className="form-input"
                   value={editedProfile.department}
                   onChange={(e) => handleInputChange('department', e.target.value)}
+                  style={{ fontSize: isMobile ? '16px' : '1rem' }}
                 />
               ) : (
-                <div style={{ padding: '0.75rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem' }}>
+                <div style={{ 
+                  padding: isMobile ? '0.5rem' : '0.75rem', 
+                  backgroundColor: '#f8fafc', 
+                  borderRadius: '0.5rem',
+                  fontSize: isMobile ? '0.875rem' : '1rem'
+                }}>
                   {profile.department}
                 </div>
               )}
             </div>
 
             <div>
-              <label className="form-label">Employee ID</label>
-              <div style={{ padding: '0.75rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem', color: '#64748b' }}>
+              <label className="form-label" style={{ fontSize: isMobile ? '0.875rem' : '1rem' }}>
+                Employee ID
+              </label>
+              <div style={{ 
+                padding: isMobile ? '0.5rem' : '0.75rem', 
+                backgroundColor: '#f8fafc', 
+                borderRadius: '0.5rem', 
+                color: '#64748b',
+                fontSize: isMobile ? '0.875rem' : '1rem'
+              }}>
                 {profile.employeeId}
               </div>
             </div>
@@ -170,45 +248,71 @@ const EmployeeProfile = ({ user }) => {
         </div>
 
         {/* Contact Information */}
-        <div className="card">
+        <div className="card" style={{ padding: isMobile ? '1.5rem' : '2rem' }}>
           <div className="card-header">
-            <h3 className="card-title">Contact Information</h3>
+            <h3 className="card-title" style={{ fontSize: isMobile ? '1.1rem' : '1.25rem' }}>
+              Contact Information
+            </h3>
           </div>
-          <div style={{ display: 'grid', gap: '1rem' }}>
+          <div style={{ display: 'grid', gap: isMobile ? '0.75rem' : '1rem' }}>
             <div>
-              <label className="form-label">Email</label>
-              <div style={{ padding: '0.75rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem', color: '#64748b' }}>
+              <label className="form-label" style={{ fontSize: isMobile ? '0.875rem' : '1rem' }}>
+                Email
+              </label>
+              <div style={{ 
+                padding: isMobile ? '0.5rem' : '0.75rem', 
+                backgroundColor: '#f8fafc', 
+                borderRadius: '0.5rem', 
+                color: '#64748b',
+                fontSize: isMobile ? '0.875rem' : '1rem'
+              }}>
                 {user?.email}
               </div>
             </div>
 
             <div>
-              <label className="form-label">Phone</label>
+              <label className="form-label" style={{ fontSize: isMobile ? '0.875rem' : '1rem' }}>
+                Phone
+              </label>
               {isEditing ? (
                 <input
                   type="tel"
                   className="form-input"
                   value={editedProfile.phone}
                   onChange={(e) => handleInputChange('phone', e.target.value)}
+                  style={{ fontSize: isMobile ? '16px' : '1rem' }}
                 />
               ) : (
-                <div style={{ padding: '0.75rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem' }}>
+                <div style={{ 
+                  padding: isMobile ? '0.5rem' : '0.75rem', 
+                  backgroundColor: '#f8fafc', 
+                  borderRadius: '0.5rem',
+                  fontSize: isMobile ? '0.875rem' : '1rem'
+                }}>
                   {profile.phone}
                 </div>
               )}
             </div>
 
             <div>
-              <label className="form-label">Address</label>
+              <label className="form-label" style={{ fontSize: isMobile ? '0.875rem' : '1rem' }}>
+                Address
+              </label>
               {isEditing ? (
                 <textarea
                   className="form-input"
                   value={editedProfile.address}
                   onChange={(e) => handleInputChange('address', e.target.value)}
                   rows="3"
+                  style={{ fontSize: isMobile ? '16px' : '1rem' }}
                 />
               ) : (
-                <div style={{ padding: '0.75rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem' }}>
+                <div style={{ 
+                  padding: isMobile ? '0.5rem' : '0.75rem', 
+                  backgroundColor: '#f8fafc', 
+                  borderRadius: '0.5rem',
+                  fontSize: isMobile ? '0.875rem' : '1rem'
+                }}>
                   {profile.address}
                 </div>
               )}
@@ -217,27 +321,45 @@ const EmployeeProfile = ({ user }) => {
         </div>
 
         {/* Employment Details */}
-        <div className="card">
+        <div className="card" style={{ padding: isMobile ? '1.5rem' : '2rem' }}>
           <div className="card-header">
-            <h3 className="card-title">Employment Details</h3>
+            <h3 className="card-title" style={{ fontSize: isMobile ? '1.1rem' : '1.25rem' }}>
+              Employment Details
+            </h3>
           </div>
-          <div style={{ display: 'grid', gap: '1rem' }}>
+          <div style={{ display: 'grid', gap: isMobile ? '0.75rem' : '1rem' }}>
             <div>
-              <label className="form-label">Start Date</label>
-              <div style={{ padding: '0.75rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem' }}>
+              <label className="form-label" style={{ fontSize: isMobile ? '0.875rem' : '1rem' }}>
+                Start Date
+              </label>
+              <div style={{ 
+                padding: isMobile ? '0.5rem' : '0.75rem', 
+                backgroundColor: '#f8fafc', 
+                borderRadius: '0.5rem',
+                fontSize: isMobile ? '0.875rem' : '1rem'
+              }}>
                 {new Date(profile.startDate).toLocaleDateString()}
               </div>
             </div>
 
             <div>
-              <label className="form-label">Manager</label>
-              <div style={{ padding: '0.75rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem' }}>
+              <label className="form-label" style={{ fontSize: isMobile ? '0.875rem' : '1rem' }}>
+                Manager
+              </label>
+              <div style={{ 
+                padding: isMobile ? '0.5rem' : '0.75rem', 
+                backgroundColor: '#f8fafc', 
+                borderRadius: '0.5rem',
+                fontSize: isMobile ? '0.875rem' : '1rem'
+              }}>
                 {profile.manager}
               </div>
             </div>
 
             <div>
-              <label className="form-label">Skills</label>
+              <label className="form-label" style={{ fontSize: isMobile ? '0.875rem' : '1rem' }}>
+                Skills
+              </label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                 {profile.skills.map((skill, index) => (
                   <span
@@ -245,9 +367,9 @@ const EmployeeProfile = ({ user }) => {
                     style={{
                       background: '#eff6ff',
                       color: '#1e40af',
-                      padding: '0.25rem 0.75rem',
+                      padding: isMobile ? '0.25rem 0.5rem' : '0.25rem 0.75rem',
                       borderRadius: '1rem',
-                      fontSize: '0.875rem',
+                      fontSize: isMobile ? '0.75rem' : '0.875rem',
                       fontWeight: 500
                     }}
                   >
@@ -260,13 +382,17 @@ const EmployeeProfile = ({ user }) => {
         </div>
 
         {/* Rewards */}
-        <div className="card">
+        <div className="card" style={{ padding: isMobile ? '1.5rem' : '2rem' }}>
           <div className="card-header">
-            <h3 className="card-title">Rewards & Recognition</h3>
+            <h3 className="card-title" style={{ fontSize: isMobile ? '1.1rem' : '1.25rem' }}>
+              Rewards & Recognition
+            </h3>
           </div>
-          <div style={{ display: 'grid', gap: '1rem' }}>
+          <div style={{ display: 'grid', gap: isMobile ? '0.75rem' : '1rem' }}>
             <div>
-              <label className="form-label">Rewards & Achievements</label>
+              <label className="form-label" style={{ fontSize: isMobile ? '0.875rem' : '1rem' }}>
+                Rewards & Achievements
+              </label>
               {isEditing ? (
                 <textarea
                   className="form-input"
@@ -274,9 +400,15 @@ const EmployeeProfile = ({ user }) => {
                   onChange={(e) => handleInputChange('rewards', e.target.value)}
                   placeholder="List your rewards and achievements"
                   rows="4"
+                  style={{ fontSize: isMobile ? '16px' : '1rem' }}
                 />
               ) : (
-                <div style={{ padding: '0.75rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem' }}>
+                <div style={{ 
+                  padding: isMobile ? '0.5rem' : '0.75rem', 
+                  backgroundColor: '#f8fafc', 
+                  borderRadius: '0.5rem',
+                  fontSize: isMobile ? '0.875rem' : '1rem'
+                }}>
                   {profile.rewards || 'No rewards recorded yet'}
                 </div>
               )}
